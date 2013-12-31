@@ -6,10 +6,50 @@ using System.Threading.Tasks;
 
 namespace GameboyEmulator
 {
+    /// <summary>
+    /// Class to create a GameboyCPU object to handle the emulation of a 
+    /// modified Z80 CPU used by the original Nintendo Gameboy.
+    /// </summary>
     class GameboyCPU
     {
-        private byte stackPtr;
-        private byte programCnt;
+        private short stackPtr;
+        private short programCnt;
+        private byte flagReg;
+        private byte clockM;
+        private byte clockT;
+        private RegisterFile regFile;
+        private byte[] gameProg;
+
+        /*Constructor for the GameboyCPU object*/
+        /// <summary>
+        /// Constructs a GameboyCPU object to emulate a 
+        /// Gameboy CPU.
+        /// </summary>
+        /// <param name="gameProg">A byte array containing the ROM data of a Nintendo Gameboy game.</param>
+        public GameboyCPU(byte[] gameProgram)
+        {
+            this.gameProg = gameProgram;
+            this.stackPtr = 0;
+            this.programCnt = 0;
+            this.flagReg = 0;
+            this.clockM = 0;
+            this.clockT = 0;
+            this.regFile = new RegisterFile();
+        }
+
+        /*Struct containing the Z80 register file*/
+        protected struct RegisterFile
+        { 
+            public byte RegA {get; set; }
+            public byte RegB { get;  set; }
+            public byte RegC { get; set; }
+            public byte RegD { get; set; }
+            public byte RegE { get; set; }
+            public byte RegH { get; set; }
+            public byte RegL { get; set; }
+            public byte RegM { get; set; }
+            public byte RegT { get; set; }
+        }
 
         /*Listing of 1byte Opcodes for modified Z80*/
         public enum OPCodes
@@ -268,6 +308,7 @@ namespace GameboyEmulator
             RST_38
         }
 
+        /*Listing of 2 byte OP Codes*/
         public enum OPCodes2Bytes
         {
             /*0x*/ RLC_B, RLC_C, RLC_D, RLC_E, RLC_H, RLC_L, RLC_HL, RLC_A, RRC_B, RRC_C, RRC_D, RRC_E, RRC_H, RRC_L, RRC_HL, RRC_A,
@@ -289,7 +330,7 @@ namespace GameboyEmulator
         }
 
         /*Property to access the current value of the stack pointer*/
-        public byte StackPointer
+        public short StackPointer
         {
             get
             {
@@ -298,11 +339,20 @@ namespace GameboyEmulator
         }
 
         /*Property to access the current value of the program counter*/
-        public byte ProgramCounter
+        public short ProgramCounter
         {
             get
             {
                 return programCnt;
+            }
+        }
+
+        /*Property to access the current value of the flag register*/
+        public byte FlagRegister
+        {
+            get
+            {
+                return flagReg;
             }
         }
     }
